@@ -1,0 +1,63 @@
+{
+    "camera": {
+        "index": 1,
+        "width": 640,
+        "height": 480,
+        "fps": 30
+    },
+    "detection": {
+        "model": "yolov8n.pt",
+        "confidence": 0.65,
+        "person_class_id": 0
+    },
+    "pose": {
+        "enabled": true,
+        "model": "yolov8n-pose.pt",
+        "confidence_threshold": 0.5,
+        "run_every_n_frames": 1,
+        "draw_landmarks": true
+    },
+    "tracking": {
+        "max_age": 30,
+        "min_hits": 3,
+        "post_fall_track_hold_seconds": 2.5
+    },
+    "fall": {
+        "confirmation_frames": 15,
+        "possible_fall_frames": 5,
+        "cooldown_seconds": 30,
+        "torso_angle_threshold": 50,
+        "fast_drop_threshold": 0.04,
+        "aspect_ratio_threshold": 1.1
+    },
+    "recognition": {
+        "yunet_model": "models/face_detection_yunet_2023mar.onnx",
+        "sface_model": "models/face_recognition_sface_2021dec.onnx",
+        "confidence_threshold": 0.363,
+        "run_every_n_frames": 10
+    },
+    "position": {
+        "zone_columns": 3,
+        "zone_rows": 3
+    },
+    "servo": {
+        "home_angle": 90,
+        "left_angle": 45,
+        "center_angle": 90,
+        "right_angle": 135,
+        "hold_time_seconds": 2,
+        "min_angle": 10,
+        "max_angle": 170
+    },
+    "ui": {
+        "window_width": 1280,
+        "window_height": 720,
+        "sidebar_width": 320,
+        "font_size": 16,
+        "fps_cap": 30
+    },
+    "events": {
+        "local_log_path": "data/events/event_log.json",
+        "snapshot_dir": "data/events/snapshots"
+    }
+}
