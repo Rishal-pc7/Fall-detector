@@ -64,3 +64,20 @@ class FirebaseDB:
         except Exception as e:
             logger.error(f"Firebase RTDB update error: {e}")
             return False
+
+    def get_fcm_tokens(self) -> list:
+        """
+        Fetch all registered FCM tokens.
+        """
+        if not self.connected:
+            return []
+            
+        try:
+            ref = db.reference("fcm_tokens")
+            tokens_dict = ref.get()
+            if tokens_dict and isinstance(tokens_dict, dict):
+                return list(tokens_dict.keys())
+            return []
+        except Exception as e:
+            logger.error(f"Failed to fetch FCM tokens: {e}")
+            return []

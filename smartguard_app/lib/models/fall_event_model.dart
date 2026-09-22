@@ -11,6 +11,7 @@ class FallEventModel {
     this.imageLink,
   });
 
+  factory FallEventModel.fromMap(String id, dynamic map) {
     return FallEventModel(
       id: id,
       personName: map['person_name']?.toString() ?? 'Fall detected',

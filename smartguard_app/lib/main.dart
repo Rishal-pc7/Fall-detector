@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 import 'services/notification_service.dart';
 import 'screens/home_screen.dart';
+
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+  debugPrint("Handling a background message: ${message.messageId}");
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,6 +22,26 @@ void main() async {
   try {
     // Initialize Firebase using google-services.json
     await Firebase.initializeApp();
+    
+    // Set up background messaging
+    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+    
+    // Request permission for iOS/Android
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+    await messaging.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+    
+    // Get the FCM token and save it to Realtime Database
+    String? token = await messaging.getToken();
+    if (token != null) {
+      debugPrint("FCM Token: $token");
+      DatabaseReference ref = FirebaseDatabase.instance.ref("fcm_tokens");
+      await ref.child(token).set(true);
+    }
+
     runApp(const SmartGuardApp());
   } catch (e, stackTrace) {
     debugPrint('Firebase initialization failed: $e');

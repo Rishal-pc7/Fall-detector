@@ -11,6 +11,7 @@ import threading
 import queue
 import time
 import logging
+from firebase_admin import messaging
 
 logger = logging.getLogger(__name__)
 
@@ -61,6 +62,23 @@ class EventQueue:
                     self._retry(task)
                     continue
                     
+                # Send FCM Notification spontaneously
+                try:
+                    fcm_tokens = self.db_client.get_fcm_tokens()
+                    if fcm_tokens:
+                        message = messaging.MulticastMessage(
+                            notification=messaging.Notification(
+                                title="🚨 SmartGuard Fall Alert",
+                                body=f"Fall detected at {timestamp}"
+                            ),
+                            tokens=fcm_tokens,
+                        )
+                        messaging.send_multicast(message)
+                        logger.info(f"Sent FCM notification for event {event_id} to {len(fcm_tokens)} devices")
+                except Exception as e:
+                    logger.error(f"Failed to send FCM notification: {e}")
+                    
+
                 # 2. Upload to Storage
                 image_url = self.storage_client.upload_event_image(event_id, image_path)
                 
