@@ -1,4 +1,4 @@
-﻿"""
+"""
 trigger_dummy_fall.py
 
 Quick test script to fire a fake fall event end-to-end:
@@ -74,7 +74,7 @@ try:
             ),
             tokens=fcm_tokens,
         )
-        response = messaging.send_multicast(message)
+        response = messaging.send_each_for_multicast(message)
         logger.info(f"  FCM sent to {len(fcm_tokens)} device(s). Success: {response.success_count}, Failure: {response.failure_count}")
     else:
         logger.warning("  No FCM tokens registered. Open the Flutter app on a device first.")

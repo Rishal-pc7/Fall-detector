@@ -73,7 +73,7 @@ class EventQueue:
                             ),
                             tokens=fcm_tokens,
                         )
-                        messaging.send_multicast(message)
+                        messaging.send_each_for_multicast(message)
                         logger.info(f"Sent FCM notification for event {event_id} to {len(fcm_tokens)} devices")
                 except Exception as e:
                     logger.error(f"Failed to send FCM notification: {e}")

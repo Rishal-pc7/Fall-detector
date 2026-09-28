@@ -4,7 +4,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:intl/intl.dart';
 
 import '../models/fall_event_model.dart';
-import '../services/notification_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -15,7 +14,6 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late final DatabaseReference _dbRef;
-  final Set<String> _notifiedEventIds = {};
   final List<FallEventModel> _events = [];
   bool _isLoading = true;
   String? _errorMessage;
@@ -48,25 +46,6 @@ class _HomeScreenState extends State<HomeScreen> {
             if (val is Map) {
               final model = FallEventModel.fromMap(key.toString(), val);
               loaded.add(model);
-
-              if (model.imageLink != null &&
-                  model.imageLink!.isNotEmpty &&
-                  !_notifiedEventIds.contains(model.id)) {
-                _notifiedEventIds.add(model.id);
-
-                String formattedTime = model.timestamp;
-                try {
-                  final dt = DateTime.parse(model.timestamp);
-                  formattedTime = DateFormat('h:mm a').format(dt);
-                } catch (_) {}
-
-                NotificationService().showFallAlert(
-                  id: model.id.hashCode,
-                  personName: model.personName,
-                  timeFormatted: formattedTime,
-                  imageUrl: model.imageLink,
-                );
-              }
             }
           });
 
