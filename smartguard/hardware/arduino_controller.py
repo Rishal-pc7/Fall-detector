@@ -42,6 +42,29 @@ class ArduinoController:
         cmd = f"FALL:{int(angle)}:{int(x)}:{int(y)}\n"
         self.queue.put(cmd)
 
+    def send_track_person(self, x: int):
+        """
+        Enqueue a TRACK command — tells the Arduino to follow a live person.
+        x is the person's center X pixel in the camera frame (0-640).
+        Replaces any previous TRACK in the queue to avoid stale commands.
+        """
+        # Drain any pending TRACK commands to keep only the freshest position
+        try:
+            while True:
+                old = self.queue.get_nowait()
+                if not old.startswith("TRACK"):
+                    self.queue.put(old)  # put non-TRACK commands back
+        except Exception:
+            pass
+        cmd = f"TRACK:{int(x)}\n"
+        self.queue.put(cmd)
+
+    def send_resume_sweep(self):
+        """Enqueue a SWEEP command — tells the Arduino no person is in frame."""
+        cmd = "SWEEP\n"
+        self.queue.put(cmd)
+
+
     def _run_loop(self):
         # Attempt to connect
         try:

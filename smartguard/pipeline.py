@@ -33,6 +33,7 @@ class SmartGuardPipeline:
         self.app_state = app_state
         self.config = config
         self.event_manager = event_manager
+        self.arduino_client = event_manager.arduino_client
 
         # 1. Person Detection & Tracking
         det_cfg = config.get("detection", {})
@@ -235,6 +236,19 @@ class SmartGuardPipeline:
 
             # 6. Cleanup Stale Tracks
             self.app_state.remove_stale_tracks(active_ids)
+
+            # 7. Servo Tracking: follow person when in frame, sweep when empty
+            if real_active_ids:
+                # Pick the person with the largest bbox area as primary subject
+                primary_det = max(
+                    detections,
+                    key=lambda d: (d["bbox"][2] - d["bbox"][0]) * (d["bbox"][3] - d["bbox"][1])
+                )
+                px1, _, px2, _ = primary_det["bbox"]
+                person_center_x = int((px1 + px2) / 2)
+                self.arduino_client.send_track_person(person_center_x)
+            else:
+                self.arduino_client.send_resume_sweep()
 
             # Prevent 100% CPU spinning
             time.sleep(0.005)
